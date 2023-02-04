@@ -26,10 +26,9 @@ app.get('/', async (req, res) => {
 
 app.post('/chatgpt', async (req, res) => {
 	try {
-		const prompt = req.body.prompt;
 		const response = await openai.createCompletion({
-			model: "text-davinci-003",
-			prompt: `${prompt}`,
+			model: `${req.body.model}`,
+			prompt: `${req.body.prompt}`,
 			temperature: 0,
 			max_tokens: 3000,
 			top_p: 1,
