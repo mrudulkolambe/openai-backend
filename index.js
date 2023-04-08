@@ -1,7 +1,8 @@
-import express from 'express'
+import express, { response } from 'express'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
 import { Configuration, OpenAIApi } from 'openai'
+import axios from 'axios'
 const port = 5501
 
 dotenv.config()
@@ -22,6 +23,23 @@ app.get('/', async (req, res) => {
 	res.status(200).send({
 		message: 'Hello World ;)'
 	})
+})
+
+app.get('/models', async (req, res) => {
+	try {
+		axios('https://api.openai.com/v1/models', {
+			method: "GET",
+			headers: {
+				'Authorization': `Bearer ${process.env.API_KEY}`
+			}
+		})
+		.then((response) => {
+			res.status(200).send(response.data);
+		})
+
+	} catch (error) {
+		res.status(500).send(error || 'Something went wrong');
+	}
 })
 
 app.post('/chatgpt', async (req, res) => {
@@ -52,12 +70,12 @@ app.post('/app-chatgpt', async (req, res) => {
 			model: `${req.body.model}`,
 			prompt: `${req.body.prompt}`,
 			temperature: 0,
-			max_tokens: 3000,
+			max_tokens: 2000,
 			top_p: 1,
 			frequency_penalty: 0.5,
 			presence_penalty: 0,
 		});
-		res.status(200).json({choices: [{text: response.data.choices[0].text}]});
+		res.status(200).json({ choices: [{ text: response.data.choices[0].text }] });
 	} catch (error) {
 		res.status(500).json({ error: { message: error.message } });
 	}
